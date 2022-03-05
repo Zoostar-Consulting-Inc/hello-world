@@ -1,53 +1,30 @@
 package net.zoostar.hw.service.impl;
 
-import java.util.Optional;
+import javax.persistence.EntityExistsException;
 
-import javax.persistence.EntityNotFoundException;
-
-import net.zoostar.hw.entity.SourceEntity;
-import net.zoostar.hw.repository.EntityRepository;
 import net.zoostar.hw.service.EntityService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public abstract class AbstractEntityService<E extends SourceEntity<T>, T>
-implements EntityService<E, T> {
+public abstract class AbstractEntityService<P extends Persistable<T>, T> implements EntityService<P, T> {
 
-	protected final Logger log = LoggerFactory.getLogger(this.getClass());
+	protected final Logger log = LoggerFactory.getLogger(getClass());
 
-	public abstract EntityRepository<E, T> getRepository();
+	protected abstract PagingAndSortingRepository<P, T> getEntityRepository();
+
+	protected abstract void validate(P persistable);
 	
-	@Override
-	public E create(E entity) {
-		log.info("Persisting entity: {}...", entity);
-		return getRepository().save(entity);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public E retrieve(String sourceCode, String sourceId) {
-		log.info("Find Entity by Source Code: {} and Source ID: {}", sourceCode, sourceId);
-		Optional<E> optional = getRepository().findBySourceCodeAndId(sourceCode, sourceId);
-		if(optional.isEmpty()) {
-			throw new EntityNotFoundException(String.format("No Entity found for sourceCode: %s and sourceId: %s", sourceCode, sourceId));
+	public P create(P persistable) {
+		log.info("Creating new entity from persistable: {}...", persistable);
+		if(!persistable.isNew()) {
+			throw new EntityExistsException("Provided persistable object for creation is not new!");
 		}
-		return optional.get();
+		validate(persistable);
+		return getEntityRepository().save(persistable);
 	}
-
-	@Override
-	public E update(E entity, E persistable) {
-		log.info("Updating {} with ID: {}", persistable, entity.getId());
-		persistable.setId(entity.getId());
-		return getRepository().save(persistable);
-	}
-
-	@Override
-	public void delete(T id) {
-		log.info("Deleting entity for id: {}...", id);
-		getRepository().deleteById(id);
-	}
-
 }

@@ -5,7 +5,7 @@ import javax.persistence.EntityNotFoundException;
 import net.zoostar.hw.entity.SourceEntity;
 import net.zoostar.hw.entity.SourceEntityMapper;
 import net.zoostar.hw.service.EntityService;
-import net.zoostar.hw.service.SourceService;
+import net.zoostar.hw.service.SourceEntityService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public abstract class AbstractSourceApi<E extends SourceEntity<T>, T> {
 
 	@Getter
 	@Autowired
-	private SourceService<E, T> sourceManager;
+	private SourceEntityService<E, T> sourceEntityManager;
 
 	protected abstract String getEndPoint();
 	
@@ -38,10 +38,10 @@ public abstract class AbstractSourceApi<E extends SourceEntity<T>, T> {
 		try {
 			var entity = getEntityManager().retrieve(sourceCode, sourceId);
 			log.info("Entity retrieved: {}", entity);
-			response = sourceManager.update(entity, getEndPoint(), getEntityMapperClazz());
+			response = sourceEntityManager.update(entity, getEndPoint(), getEntityMapperClazz());
 		} catch(EntityNotFoundException e) {
 			log.info("{}", e.getMessage());
-			response = new ResponseEntity<>(getSourceManager().create(
+			response = new ResponseEntity<>(getSourceEntityManager().create(
 					sourceCode, sourceId, getEndPoint(), getEntityMapperClazz()), HttpStatus.CREATED);
 		}
 		log.info("Response: {}", response);

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.Getter;
 
 @Service
-public class ProductServiceImpl extends AbstractEntityService<Product, String> {
+public class ProductServiceImpl extends AbstractSourceEntityService<Product, String> {
 
 	@Getter
 	@Autowired

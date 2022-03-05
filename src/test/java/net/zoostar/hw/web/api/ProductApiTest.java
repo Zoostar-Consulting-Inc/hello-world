@@ -1,6 +1,6 @@
 package net.zoostar.hw.web.api;
 
-import static net.zoostar.hw.service.SourceService.PROTOCOL;
+import static net.zoostar.hw.service.SourceEntityService.PROTOCOL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,7 +12,7 @@ import java.util.UUID;
 import net.zoostar.hw.AbstractMockTestHarness;
 import net.zoostar.hw.entity.Product;
 import net.zoostar.hw.entity.Source;
-import net.zoostar.hw.service.SourceService;
+import net.zoostar.hw.service.SourceEntityService;
 import net.zoostar.hw.web.request.ProductRequest;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 class ProductApiTest extends AbstractMockTestHarness<Product, String> {
 	
 	@Autowired
-	protected SourceService<Product, String> sourceManager;
+	protected SourceEntityService<Product, String> sourceManager;
 	
 	@Test
 	void testCreate() throws Exception {
@@ -45,7 +45,7 @@ class ProductApiTest extends AbstractMockTestHarness<Product, String> {
 				thenReturn(Optional.of(source));
 		
 		var headers = new HttpHeaders();
-		headers.add(SourceService.CONTENT_ENCODING, SourceService.GZIP);
+		headers.add(SourceEntityService.CONTENT_ENCODING, SourceEntityService.GZIP);
 		when(rest.getForEntity(Mockito.eq(PROTOCOL + source.getBaseUrl() + "/product/retrieve?id=" + request.getSourceId()),
 				Mockito.eq(ProductRequest.class), Mockito.any(HttpHeaders.class))).thenReturn(new ResponseEntity<>(request, HttpStatus.OK));
 		

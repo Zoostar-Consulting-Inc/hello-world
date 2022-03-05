@@ -2,13 +2,15 @@ package net.zoostar.hw.service.impl;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import javax.xml.bind.ValidationException;
 
 import net.zoostar.hw.entity.Source;
 import net.zoostar.hw.entity.SourceEntity;
 import net.zoostar.hw.entity.SourceEntityMapper;
 import net.zoostar.hw.repository.SourceRepository;
 import net.zoostar.hw.service.EntityService;
-import net.zoostar.hw.service.SourceService;
+import net.zoostar.hw.service.SourceEntityService;
+import net.zoostar.hw.service.Validator;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 public class SourceServiceImpl<E extends SourceEntity<T>, T>
-implements SourceService<E, T>, InitializingBean {
+implements SourceEntityService<E, T>, InitializingBean {
 
     @Autowired
 	protected SourceRepository repository;
@@ -39,6 +41,9 @@ implements SourceService<E, T>, InitializingBean {
 	
 	@Autowired
 	protected RestTemplate api;
+	
+	@Autowired
+	protected Validator<Source> requiredFieldValidator;
 	
 	protected HttpHeaders headers;
 
@@ -122,14 +127,18 @@ implements SourceService<E, T>, InitializingBean {
 	}
 
 	@Override
-	public Source update(Source persistable) {
-		//TODO: Add validations
+	public Source update(Source persistable) throws ValidationException {
+		validate(persistable);
 		var entity = repository.findBySourceCode(persistable.getSourceCode());
 		if(entity.isEmpty()) {
 			throw new EntityNotFoundException("No existing entity found for update: " + persistable.toString());
 		}
 		persistable.setId(entity.get().getId());
 		return repository.save(persistable);
+	}
+
+	protected void validate(Source persistable) throws ValidationException {
+		requiredFieldValidator.validate(persistable);
 	}
 
 }

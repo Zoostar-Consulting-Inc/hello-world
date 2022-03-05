@@ -1,10 +1,10 @@
 package net.zoostar.hw.service;
 
-import net.zoostar.hw.entity.SourceEntity;
+import org.springframework.data.domain.Persistable;
 
-public interface EntityService<E extends SourceEntity<T>, T> {
-	E create(E entity);
-	E retrieve(String sourceCode, String sourceId);
-	E update(E entity, E persistable);
+public interface EntityService<P extends Persistable<T>, T> {
+	P create(P persistable);
+	P retrieveByKey(P persistable);
+	P update(P persistable);
 	void delete(T id);
 }

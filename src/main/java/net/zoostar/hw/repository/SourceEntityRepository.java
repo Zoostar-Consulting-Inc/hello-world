@@ -6,6 +6,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @NoRepositoryBean
-public interface EntityRepository<E, T> extends PagingAndSortingRepository<E, T> {
+public interface SourceEntityRepository<E, T> extends PagingAndSortingRepository<E, T> {
 	Optional<E> findBySourceCodeAndId(String sourceCode, String sourceId);
 }

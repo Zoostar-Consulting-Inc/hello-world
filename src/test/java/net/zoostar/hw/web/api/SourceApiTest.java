@@ -10,7 +10,7 @@ import java.util.UUID;
 import net.zoostar.hw.AbstractMockTestHarness;
 import net.zoostar.hw.entity.Product;
 import net.zoostar.hw.entity.Source;
-import net.zoostar.hw.service.SourceService;
+import net.zoostar.hw.service.SourceEntityService;
 import net.zoostar.hw.web.request.SourceRequest;
 import net.zoostar.hw.web.response.PageResponse;
 
@@ -28,7 +28,7 @@ class SourceApiTest extends AbstractMockTestHarness<Source, String> {
 	private static final int PAGE_LIMIT = 3;
 	
 	@Autowired
-	protected SourceService<Product, String> sourceManager;
+	protected SourceEntityService<Product, String> sourceManager;
 	
 	@Test
 	void testCreate() throws Exception {
@@ -71,6 +71,30 @@ class SourceApiTest extends AbstractMockTestHarness<Source, String> {
 		//given
 		var request = new SourceRequest(toSource("source"));
 		String url = "/api/source/create";
+
+		//mock-when
+		var entity = request.toEntity();
+		entity.setId(UUID.randomUUID().toString());
+		when(sourceRepository.findBySourceCode(request.getSourceCode())).
+				thenReturn(Optional.of(entity));
+		
+		var result = service.perform(MockMvcRequestBuilders.post(url).
+				contentType(MediaType.APPLICATION_JSON).
+				content(mapper.writeValueAsString(request)).
+				accept(MediaType.APPLICATION_JSON)).
+				andReturn();
+		
+		//then
+		assertThat(result).isNotNull();
+		var response = result.getResponse();
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+	}
+	
+	@Test
+	void testRetrieveThrowsEntityNotFoundException() throws Exception {
+		//given
+		var request = new SourceRequest(toSource("source"));
+		String url = "/api/source/retrieve";
 
 		//mock-when
 		var entity = request.toEntity();
@@ -198,6 +222,26 @@ class SourceApiTest extends AbstractMockTestHarness<Source, String> {
 			assertThat(source).isEqualTo(records.get(offset + i));
 			log.info("Source: {}", source.toString());
 		}
+	}
+	
+	@Test
+	void testUpdateThrowingRequiredFieldValidationException() throws Exception {
+		//given
+		var request = new SourceRequest(toSource(""));
+		String url = "/api/source/update";
+
+		//mock-when
+		var result = service.perform(MockMvcRequestBuilders.post(url).
+				contentType(MediaType.APPLICATION_JSON).
+				content(mapper.writeValueAsString(request)).
+				accept(MediaType.APPLICATION_JSON)).
+				andReturn();
+		
+		//then
+		assertThat(result).isNotNull();
+		var response = result.getResponse();
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+		log.warn("{}", response.getErrorMessage());
 	}
 	
 	private void testRetrieveByFirstPage(int pageNum) throws Exception {

@@ -3,6 +3,7 @@ package net.zoostar.hw;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.zoostar.hw.util.Generated;
 import net.zoostar.hw.web.interceptor.GZIPClientHttpRequestInterceptor;
 
 import org.springframework.boot.SpringApplication;
@@ -23,6 +24,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 @EnableJpaRepositories(basePackages = {"net.zoostar.hw.repository"})
 public class HelloWorldApp {
 	
+	@Generated
 	public static void main(String[] args) {
 		SpringApplication.run(HelloWorldApp.class, args);
 	}

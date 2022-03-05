@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
-import net.zoostar.hw.service.SourceService;
+import net.zoostar.hw.service.SourceEntityService;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,9 +24,9 @@ public class GZIPClientHttpResponseWrapper implements ClientHttpResponse {
 	@Override
 	public InputStream getBody() throws IOException {
 		InputStream is = null;
-		var value = response.getHeaders().getFirst(SourceService.CONTENT_ENCODING);
-		if(SourceService.GZIP.equalsIgnoreCase(value)) {
-			log.info("Received {}: {}", SourceService.CONTENT_ENCODING, value);
+		var value = response.getHeaders().getFirst(SourceEntityService.CONTENT_ENCODING);
+		if(SourceEntityService.GZIP.equalsIgnoreCase(value)) {
+			log.info("Received {}: {}", SourceEntityService.CONTENT_ENCODING, value);
 			is = new GZIPInputStream(response.getBody());
 		} else {
 			is = response.getBody();

@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import net.zoostar.hw.service.SourceService;
+import net.zoostar.hw.service.SourceEntityService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,7 +73,7 @@ class GZIPClientHttpResponseWrapperTest {
 		
 		try(InputStream fis = new FileInputStream(file)) {
 			ClientHttpResponse response = new MockClientHttpResponse(fis, HttpStatus.OK);
-			response.getHeaders().add(SourceService.CONTENT_ENCODING, SourceService.GZIP);
+			response.getHeaders().add(SourceEntityService.CONTENT_ENCODING, SourceEntityService.GZIP);
 			try(var wrapper = new GZIPClientHttpResponseWrapper(response)) {
 				assertThat(wrapper.getStatusCode()).isEqualTo(HttpStatus.OK);
 				try(InputStream is = wrapper.getBody()) {
